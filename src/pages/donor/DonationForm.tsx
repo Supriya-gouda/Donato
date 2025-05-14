@@ -10,16 +10,16 @@ import { useAuth } from '../../context/AuthContext';
 const DonationForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const organization = getOrganizationById(id || '');
-  const { user } = useAuth();
+  const { user: currentUser } = useAuth(); // Renamed but not used yet, will be needed for API integration
   const navigate = useNavigate();
-  
+
   const [donationType, setDonationType] = useState<DonationType>('food');
   const [description, setDescription] = useState<string>('');
   const [quantity, setQuantity] = useState<string>('');
   const [date, setDate] = useState<string>('');
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  
+
   if (!organization) {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
@@ -34,18 +34,18 @@ const DonationForm: React.FC = () => {
       </div>
     );
   }
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
       setIsSubmitted(true);
     }, 1500);
   };
-  
+
   const handleGoToDashboard = () => {
     navigate('/donor/dashboard');
   };
@@ -87,7 +87,7 @@ const DonationForm: React.FC = () => {
 
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation to {organization.name}</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2">
             <Card>
@@ -115,7 +115,7 @@ const DonationForm: React.FC = () => {
                         <option value="other">Other</option>
                       </select>
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Description
@@ -129,7 +129,7 @@ const DonationForm: React.FC = () => {
                         required
                       />
                     </div>
-                    
+
                     {donationType !== 'money' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -145,7 +145,7 @@ const DonationForm: React.FC = () => {
                         />
                       </div>
                     )}
-                    
+
                     {donationType === 'money' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -162,7 +162,7 @@ const DonationForm: React.FC = () => {
                         />
                       </div>
                     )}
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Preferred Donation Date
@@ -176,7 +176,7 @@ const DonationForm: React.FC = () => {
                         required
                       />
                     </div>
-                    
+
                     <div className="pt-4">
                       <Button
                         type="submit"
@@ -192,7 +192,7 @@ const DonationForm: React.FC = () => {
               </CardContent>
             </Card>
           </div>
-          
+
           <div>
             <Card className="mb-6">
               <CardHeader>
@@ -216,7 +216,7 @@ const DonationForm: React.FC = () => {
                 </Link>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <h3 className="font-semibold text-gray-900">Current Donation Needs</h3>

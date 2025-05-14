@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { LocationProvider } from './context/LocationContext';
 import Header from './components/shared/Header';
 import Footer from './components/shared/Footer';
+import ScrollToTop from './components/shared/ScrollToTop';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -22,9 +23,10 @@ function App() {
     <AuthProvider>
       <LocationProvider>
         <Router>
+          <ScrollToTop />
           <div className="flex flex-col min-h-screen">
             <Header />
-            <main className="flex-1 bg-gray-50">
+            <main className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50">
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />

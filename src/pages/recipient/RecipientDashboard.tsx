@@ -94,8 +94,12 @@ const RecipientDashboard: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Organization Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage donation requests, events, and your organization profile.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            {user?.name || 'Organization'} Dashboard
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Welcome back, {user?.name}! Manage donation requests, events, and your organization profile.
+          </p>
         </div>
         <div className="flex mt-4 md:mt-0 space-x-4">
           <Link to="/recipient/profile">

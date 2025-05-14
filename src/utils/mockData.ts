@@ -36,7 +36,30 @@ export const mockOrganizations: Organization[] = [
       }
     ],
     donationCount: 156,
-    events: true
+    events: true,
+    photoGallery: [
+      {
+        id: 'g1',
+        imageUrl: 'https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg',
+        caption: 'Children enjoying their new books from a recent donation',
+        date: '2024-03-15',
+        type: 'donation'
+      },
+      {
+        id: 'g2',
+        imageUrl: 'https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg',
+        caption: 'Birthday celebration event with donors',
+        date: '2024-02-20',
+        type: 'event'
+      },
+      {
+        id: 'g3',
+        imageUrl: 'https://images.pexels.com/photos/6646919/pexels-photo-6646919.jpeg',
+        caption: 'Our newly renovated study room',
+        date: '2024-01-10',
+        type: 'facility'
+      }
+    ]
   },
   {
     id: 'org2',
@@ -72,7 +95,23 @@ export const mockOrganizations: Organization[] = [
       }
     ],
     donationCount: 98,
-    events: true
+    events: true,
+    photoGallery: [
+      {
+        id: 'g4',
+        imageUrl: 'https://images.pexels.com/photos/7551617/pexels-photo-7551617.jpeg',
+        caption: 'Elderly residents enjoying the new garden area',
+        date: '2024-03-10',
+        type: 'facility'
+      },
+      {
+        id: 'g5',
+        imageUrl: 'https://images.pexels.com/photos/7551618/pexels-photo-7551618.jpeg',
+        caption: 'Music therapy session with volunteers',
+        date: '2024-02-15',
+        type: 'event'
+      }
+    ]
   },
   {
     id: 'org3',
@@ -109,7 +148,7 @@ export const mockOrganizations: Organization[] = [
     name: 'Child Dreams Foundation',
     description: 'Working towards providing education, healthcare, and nutrition to underprivileged children across multiple states.',
     address: '56 Green Park, Bangalore, 560001',
-    image: 'https://images.pexels.com/photos/1059120/pexels-photo-1059120.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    image: 'https://images.pexels.com/photos/6646917/pexels-photo-6646917.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     phone: '+91 97654 32109',
     email: 'support@childdreams.org',
     website: 'www.childdreams.org',

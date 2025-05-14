@@ -23,9 +23,14 @@ const Header: React.FC = () => {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2">
-          <Heart className="h-8 w-8 text-purple-600" />
-          <span className="text-xl font-bold text-gray-900">DONATO</span>
+        <Link to="/" className="flex items-center space-x-2 group">
+          <Heart className="h-8 w-8 text-purple-600 group-hover:scale-110 transition-transform duration-300" />
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent tracking-wide">
+              DONATO
+            </span>
+            <span className="text-xs text-gray-500 tracking-wider">Making Giving Beautiful</span>
+          </div>
         </Link>
 
         {/* Desktop navigation */}

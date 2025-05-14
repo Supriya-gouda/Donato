@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapPin, Phone, Mail, Globe, Clock, ArrowLeft, Calendar, Award, Star } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, Clock, ArrowLeft, Calendar, Award, Star, Image as ImageIcon } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Card, { CardContent, CardHeader } from '../../components/shared/Card';
 import { getOrganizationById } from '../../utils/mockData';
@@ -8,6 +8,7 @@ import { getOrganizationById } from '../../utils/mockData';
 const OrganizationDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const organization = getOrganizationById(id || '');
+  const [selectedGalleryType, setSelectedGalleryType] = useState<'all' | 'donation' | 'event' | 'facility'>('all');
 
   if (!organization) {
     return (
@@ -43,6 +44,10 @@ const OrganizationDetails: React.FC = () => {
       default: return 'Standard';
     }
   };
+
+  const filteredGallery = selectedGalleryType === 'all' 
+    ? organization.photoGallery 
+    : organization.photoGallery.filter(photo => photo.type === selectedGalleryType);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -112,19 +117,99 @@ const OrganizationDetails: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to={`/donate/${id}`} className="flex-1">
-                  <Button variant="primary" fullWidth>
-                    Donate Now
-                  </Button>
-                </Link>
-                {events && (
-                  <Link to={`/event/${id}`} className="flex-1">
-                    <Button variant="outline" fullWidth>
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Plan an Event
+              <div className="mb-8">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link to={`/donate/${id}`} className="flex-1">
+                    <Button variant="primary" fullWidth>
+                      Donate Now
                     </Button>
                   </Link>
+                  {events && (
+                    <Link to={`/event/${id}`} className="flex-1">
+                      <Button variant="outline" fullWidth>
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Plan an Event
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {/* Photo Gallery Section */}
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Photo Gallery</h2>
+                
+                {/* Gallery Filter */}
+                <div className="flex space-x-2 mb-4">
+                  <button
+                    onClick={() => setSelectedGalleryType('all')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedGalleryType === 'all'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    All Photos
+                  </button>
+                  <button
+                    onClick={() => setSelectedGalleryType('donation')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedGalleryType === 'donation'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    Donations
+                  </button>
+                  <button
+                    onClick={() => setSelectedGalleryType('event')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedGalleryType === 'event'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    Events
+                  </button>
+                  <button
+                    onClick={() => setSelectedGalleryType('facility')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedGalleryType === 'facility'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    Facilities
+                  </button>
+                </div>
+
+                {/* Gallery Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {filteredGallery.map((photo) => (
+                    <div key={photo.id} className="relative group">
+                      <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
+                        <img
+                          src={photo.imageUrl}
+                          alt={photo.caption}
+                          className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity duration-300">
+                          <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <p className="text-sm font-medium">{photo.caption}</p>
+                            <p className="text-xs mt-1">{new Date(photo.date).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {filteredGallery.length === 0 && (
+                  <div className="text-center py-8">
+                    <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">No photos found</h3>
+                    <p className="mt-1 text-sm text-gray-500">There are no photos in this category.</p>
+                  </div>
                 )}
               </div>
             </div>
