@@ -397,10 +397,4 @@ This project is licensed under the ISC License.
 
 - Development Team
 
-## 🙏 Acknowledgments
-
-- shadcn/ui for the beautiful component library
-- Radix UI for accessible component primitives
-- Supabase for backend infrastructure
-- The open-source community
 
