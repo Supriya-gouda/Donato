@@ -404,10 +404,3 @@ This project is licensed under the ISC License.
 - Supabase for backend infrastructure
 - The open-source community
 
-## 📞 Support
-
-For support, please open an issue in the repository or contact the development team.
-
----
-
-**Made with ❤️ for making a difference in the world**
