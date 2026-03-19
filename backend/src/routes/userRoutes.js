@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, isDonor } = require('../middlewares/auth');
-const supabase = require('../config/supabase');
+const { supabase } = require('../config/supabase');
 
 // User Signup
 router.post('/signup', async (req, res, next) => {
@@ -21,6 +21,7 @@ router.post('/signup', async (req, res, next) => {
       email,
       password,
       options: {
+        emailRedirectTo: 'http://localhost:5173/login',
         data: {
           user_type: 'donor',
           name,
@@ -58,9 +59,11 @@ router.post('/signup', async (req, res, next) => {
 
     res.status(201).json({ 
       success: true, 
+      message: 'Signup successful. Please check your email to verify your account.',
       data: {
         user: profile || { id: authData.user.id, name, email, phone, points: 0, badge: 'bronze' },
-        token: authData.session?.access_token
+        token: authData.session?.access_token,
+        emailConfirmationRequired: !authData.session // If no session, email confirmation is required
       }
     });
   } catch (error) {
@@ -118,6 +121,88 @@ router.post('/login', async (req, res, next) => {
         },
         token: authData.session.access_token
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Request Password Reset
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email is required' 
+      });
+    }
+
+    // Send password reset email via Supabase
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'http://localhost:5173/reset-password',
+    });
+
+    if (error) {
+      return res.status(400).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Password reset email sent. Please check your inbox.' 
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Reset Password
+router.post('/reset-password', async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'New password is required' 
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Password must be at least 6 characters' 
+      });
+    }
+
+    if (!token) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'No authorization token provided' 
+      });
+    }
+
+    // Update password in Supabase
+    const { error } = await supabase.auth.updateUser(
+      { password },
+      { accessToken: token }
+    );
+
+    if (error) {
+      return res.status(400).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Password updated successfully' 
     });
   } catch (error) {
     next(error);

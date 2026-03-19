@@ -31,7 +31,14 @@ const OrgLogin = () => {
       toast.success("Welcome back!");
       navigate("/org/dashboard");
     } catch (error: any) {
-      toast.error(error?.message || "Invalid credentials. Please try again.");
+      const errorMessage = error?.message || "Invalid credentials. Please try again.";
+      
+      // Special handling for email verification error
+      if (errorMessage.includes("verify your email") || errorMessage.includes("verification")) {
+        toast.error(errorMessage, { duration: 5000 });
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +102,11 @@ const OrgLogin = () => {
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
+              </div>
+              <div className="text-right mt-2">
+                <Link to="/org/forgot-password" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </Link>
               </div>
             </div>
 

@@ -40,16 +40,25 @@ const Signup = () => {
 
     setIsLoading(true);
     try {
-      const { user, token } = await userService.signup({
+      const response = await userService.signup({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
       });
       
-      loginUser(user, token);
-      toast.success("Account created successfully!");
-      navigate("/dashboard");
+      // Check if email confirmation is required
+      if (response.emailConfirmationRequired) {
+        toast.success("Account created! Please check your email inbox and confirm your email address to continue.", {
+          duration: 6000,
+        });
+        navigate("/login", { state: { message: "Please check your email inbox and confirm your email address to continue." } });
+      } else {
+        // Auto-login if email confirmation is not required (shouldn't normally happen)
+        loginUser(response.user, response.token);
+        toast.success("Account created successfully!");
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong. Please try again.");
     } finally {

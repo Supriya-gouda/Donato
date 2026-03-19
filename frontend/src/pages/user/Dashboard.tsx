@@ -16,6 +16,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showNearbyOnly, setShowNearbyOnly] = useState(true);
 
   const categories = [
     { value: "all", label: "All Categories" },
@@ -30,18 +31,15 @@ const Dashboard = () => {
     const fetchUserAndOrganizations = async () => {
       setIsLoading(true);
       try {
-        // Step 1: Fetch user profile from database to get current location
+        // Step 1: Fetch user profile from database
         const profile = await userService.getProfile();
         setUserProfile(profile);
         updateUser(profile);
         
-        // Step 2: Get user's city/location
-        const userCity = profile.location;
-        console.log('User location:', userCity);
-        
-        // Step 3: Fetch organizations in that city
-        const data = await orgService.getOrganizations(userCity);
+        // Step 2: Fetch all organizations from database
+        const data = await orgService.getOrganizations();
         console.log('Organizations found:', data.length);
+        console.log('User location:', profile.location);
         setOrganizations(data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -58,7 +56,14 @@ const Dashboard = () => {
       org.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
       selectedCategory === "all" || org.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    
+    // Location filter - check if organization location matches user location
+    const matchesLocation = !showNearbyOnly || 
+      !userProfile?.location || 
+      org.location?.toLowerCase().includes(userProfile.location.toLowerCase()) ||
+      userProfile.location.toLowerCase().includes(org.location?.toLowerCase() || '');
+    
+    return matchesSearch && matchesCategory && matchesLocation;
   });
 
   return (
@@ -102,12 +107,23 @@ const Dashboard = () => {
               ))}
             </select>
           </div>
+          <div className="relative">
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <select
+              value={showNearbyOnly ? "nearby" : "all"}
+              onChange={(e) => setShowNearbyOnly(e.target.value === "nearby")}
+              className="input-base pl-12 pr-10 appearance-none bg-card cursor-pointer min-w-[180px]"
+            >
+              <option value="nearby">Nearby Only</option>
+              <option value="all">All Locations</option>
+            </select>
+          </div>
         </div>
 
         {/* Organizations Grid */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">
-            Nearby Organizations ({filteredOrganizations.length})
+            {showNearbyOnly ? 'Nearby Organizations' : 'All Organizations'} ({filteredOrganizations.length})
           </h2>
         </div>
 

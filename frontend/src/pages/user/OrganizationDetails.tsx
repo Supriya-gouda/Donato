@@ -222,32 +222,21 @@ const OrganizationDetails = () => {
               </div>
             </div>
 
-            {/* Map Placeholder */}
-            <div className="card-base p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">Location</h2>
-              <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Map view coming soon</p>
-                </div>
-              </div>
-            </div>
-
             {/* Stats */}
             <div className="card-base p-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">Impact</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-accent/50 rounded-xl">
-                  <p className="text-2xl font-bold text-foreground">
-                    {organization.totalDonations}
+              <div className="space-y-4">
+                <div className="text-center p-4 bg-primary/5 rounded-xl border border-primary/10">
+                  <p className="text-3xl font-bold text-primary">
+                    {organization.totalDonations || 0}
                   </p>
-                  <p className="text-xs text-muted-foreground">Donations</p>
+                  <p className="text-sm text-muted-foreground mt-1">Total Donors</p>
                 </div>
-                <div className="text-center p-3 bg-accent/50 rounded-xl">
+                <div className="text-center p-4 bg-accent/50 rounded-xl">
                   <p className="text-2xl font-bold text-foreground">
-                    {new Date().getFullYear() - new Date(organization.createdAt).getFullYear()}+
+                    {new Date().getFullYear() - new Date(organization.createdAt).getFullYear() || 0}+
                   </p>
-                  <p className="text-xs text-muted-foreground">Years Active</p>
+                  <p className="text-sm text-muted-foreground mt-1">Years Active</p>
                 </div>
               </div>
             </div>

@@ -211,7 +211,18 @@ export const donationService = {
       
       if (!response.ok) throw new Error('Failed to fetch leaderboard');
       const result = await response.json();
-      return result.data;
+      
+      // Transform backend data to frontend format
+      const leaderboard: LeaderboardEntry[] = result.data.map((user: any) => ({
+        rank: user.rank,
+        userId: user.id,
+        name: user.name,
+        location: user.location || '',
+        points: user.points || 0,
+        badge: user.badge || 'bronze'
+      }));
+      
+      return leaderboard;
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       // Fallback to mock data

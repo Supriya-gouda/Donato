@@ -29,6 +29,7 @@ export interface Organization {
   bannerUrl?: string;
   images?: string[];
   verificationStatus?: "pending" | "verified" | "rejected";
+  emailVerified?: boolean;
   totalReceived?: number;
   donorCount?: number;
   activeRequests?: number;

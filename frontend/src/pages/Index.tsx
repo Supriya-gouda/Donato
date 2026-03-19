@@ -132,7 +132,7 @@ const Index = () => {
                 </Button>
               </Link>
               <Link to="/org/signup">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white bg-transparent text-white hover:bg-white hover:text-primary">
                   Register Your NGO
                 </Button>
               </Link>

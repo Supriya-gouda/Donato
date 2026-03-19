@@ -66,7 +66,7 @@ export const orgService = {
     registrationNumber: string;
     location: string;
     category: string;
-  }): Promise<{ organization: Organization; token: string }> {
+  }): Promise<{ organization: Organization; token: string; emailConfirmationRequired?: boolean }> {
     try {
       const response = await fetch(`${API_URL}/organizations/signup`, {
         method: 'POST',
@@ -116,7 +116,8 @@ export const orgService = {
 
       return { 
         organization, 
-        token: result.data.token 
+        token: result.data.token,
+        emailConfirmationRequired: result.data.emailConfirmationRequired 
       };
     } catch (error) {
       console.error('Signup error:', error);
@@ -209,7 +210,8 @@ export const orgService = {
         bannerUrl: org.banner_url || 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=400&fit=crop',
         images: org.images || [],
         donationNeeds: org.donation_needs || [],
-        totalDonations: org.total_donations || 0,
+        totalDonations: org.donor_count || 0,
+        totalReceived: org.total_received || 0,
         verificationStatus: org.verification_status,
         createdAt: org.created_at,
       };
@@ -220,7 +222,56 @@ export const orgService = {
       return mockOrganizations.find(org => org.id === id) || null;
     }
   },
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    try {
+      const response = await fetch(`${API_URL}/organizations/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+      
+      if (!response.ok) throw new Error('Failed to send reset email');
+      const result = await response.json();
+      
+      return { message: result.message };
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      throw error;
+    }
+  },
 
+  async resetPassword(password: string, token: string): Promise<{ message: string }> {
+    try {
+      // Import supabase dynamically to avoid circular dependencies
+      const { supabase } = await import('@/lib/supabase');
+      
+      // Set the session with the recovery token
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: token,
+        refresh_token: token,
+      });
+
+      if (sessionError) {
+        throw new Error(sessionError.message);
+      }
+
+      // Update the password
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      return { message: 'Password updated successfully' };
+    } catch (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    }
+  },
   async getOrgProfile(): Promise<Organization> {
     try {
       const token = getAuthToken();

@@ -49,6 +49,177 @@ const Profile = () => {
     }
   };
 
+  const handleDownloadCertificate = async (cert: Certificate) => {
+    try {
+      // Create a simple certificate HTML
+      const certificateContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Certificate - ${cert.organizationName}</title>
+          <style>
+            body {
+              font-family: 'Georgia', serif;
+              padding: 60px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              margin: 0;
+            }
+            .certificate {
+              background: white;
+              padding: 60px;
+              max-width: 800px;
+              margin: 0 auto;
+              border: 20px solid #f0f0f0;
+              box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 40px;
+            }
+            .title {
+              font-size: 48px;
+              color: #667eea;
+              font-weight: bold;
+              margin: 20px 0;
+            }
+            .subtitle {
+              font-size: 18px;
+              color: #666;
+              margin-bottom: 10px;
+            }
+            .content {
+              text-align: center;
+              margin: 40px 0;
+              line-height: 1.8;
+              font-size: 18px;
+            }
+            .recipient {
+              font-size: 36px;
+              color: #333;
+              font-weight: bold;
+              margin: 30px 0;
+              border-bottom: 2px solid #667eea;
+              display: inline-block;
+              padding-bottom: 10px;
+            }
+            .details {
+              margin: 30px 0;
+              padding: 20px;
+              background: #f9f9f9;
+              border-radius: 10px;
+            }
+            .detail-item {
+              display: flex;
+              justify-content: space-between;
+              margin: 10px 0;
+              padding: 10px 0;
+              border-bottom: 1px solid #e0e0e0;
+            }
+            .detail-label {
+              font-weight: bold;
+              color: #666;
+            }
+            .detail-value {
+              color: #333;
+            }
+            .footer {
+              margin-top: 60px;
+              text-align: center;
+              color: #999;
+              font-size: 14px;
+            }
+            .signature {
+              margin-top: 60px;
+              display: flex;
+              justify-content: space-around;
+            }
+            .signature-block {
+              text-align: center;
+            }
+            .signature-line {
+              width: 200px;
+              border-top: 2px solid #333;
+              margin: 0 auto 10px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="certificate">
+            <div class="header">
+              <div class="subtitle">Certificate of Appreciation</div>
+              <div class="title">DONATION CERTIFICATE</div>
+              <div class="subtitle">This certifies that</div>
+            </div>
+            
+            <div class="content">
+              <div class="recipient">${user?.name || 'Donor'}</div>
+              <p>has generously contributed to</p>
+              <h2 style="color: #667eea; margin: 20px 0;">${cert.organizationName}</h2>
+              <p>with their valuable donation</p>
+            </div>
+            
+            <div class="details">
+              <div class="detail-item">
+                <span class="detail-label">Donation Type:</span>
+                <span class="detail-value">${cert.donationType?.toUpperCase() || 'N/A'}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Certificate Number:</span>
+                <span class="detail-value">${cert.certificateNumber || cert.id}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date Issued:</span>
+                <span class="detail-value">${new Date(cert.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+              ${cert.points ? `
+              <div class="detail-item">
+                <span class="detail-label">Points Awarded:</span>
+                <span class="detail-value">${cert.points} Points</span>
+              </div>` : ''}
+            </div>
+            
+            <div class="signature">
+              <div class="signature-block">
+                <div class="signature-line"></div>
+                <p style="margin: 5px 0; font-weight: bold;">Organization Representative</p>
+                <p style="margin: 0; font-size: 12px; color: #666;">${cert.organizationName}</p>
+              </div>
+              <div class="signature-block">
+                <div class="signature-line"></div>
+                <p style="margin: 5px 0; font-weight: bold;">Verified By</p>
+                <p style="margin: 0; font-size: 12px; color: #666;">Donate Connect Platform</p>
+              </div>
+            </div>
+            
+            <div class="footer">
+              <p>This certificate acknowledges a charitable donation.</p>
+              <p>Certificate ID: ${cert.id}</p>
+              <p>Generated on ${new Date().toLocaleDateString()}</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Create a blob and download
+      const blob = new Blob([certificateContent], { type: 'text/html' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Certificate_${cert.organizationName.replace(/\s+/g, '_')}_${cert.id}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("Certificate downloaded successfully!");
+    } catch (error) {
+      console.error("Error downloading certificate:", error);
+      toast.error("Failed to download certificate");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -236,7 +407,7 @@ const Profile = () => {
                           {new Date(cert.date).toLocaleDateString()}
                         </p>
                       </div>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => handleDownloadCertificate(cert)}>
                         <Download className="w-5 h-5" />
                       </Button>
                     </div>

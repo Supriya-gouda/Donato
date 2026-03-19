@@ -62,7 +62,7 @@ const OrgSignup = () => {
 
     setIsLoading(true);
     try {
-      const { organization, token } = await orgService.signup({
+      const { organization, token, emailConfirmationRequired } = await orgService.signup({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -72,9 +72,14 @@ const OrgSignup = () => {
         category: formData.category,
       });
 
-      loginOrg(organization, token);
-      toast.success("Organization registered successfully!");
-      navigate("/org/dashboard");
+      if (emailConfirmationRequired) {
+        toast.success("Registration successful! Please check your email to verify your account.");
+        navigate("/org/verify-email");
+      } else {
+        loginOrg(organization, token);
+        toast.success("Organization registered successfully!");
+        navigate("/org/dashboard");
+      }
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong. Please try again.");
     } finally {

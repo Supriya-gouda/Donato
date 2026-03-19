@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/shared/Logo";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loginUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +17,16 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  // Display verification message if redirected from signup
+  useEffect(() => {
+    const state = location.state as { message?: string };
+    if (state?.message) {
+      toast.info(state.message, { duration: 6000 });
+      // Clear the state to prevent showing the message again on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +100,11 @@ const Login = () => {
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
+              </div>
+              <div className="text-right mt-2">
+                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                  Forgot password?
+                </Link>
               </div>
             </div>
 

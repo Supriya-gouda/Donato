@@ -12,6 +12,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/user/Dashboard";
 import Profile from "./pages/user/Profile";
 import OrganizationDetails from "./pages/user/OrganizationDetails";
@@ -19,9 +21,12 @@ import Donate from "./pages/user/Donate";
 import Leaderboard from "./pages/user/Leaderboard";
 import OrgLogin from "./pages/org/OrgLogin";
 import OrgSignup from "./pages/org/OrgSignup";
+import OrgForgotPassword from "./pages/org/OrgForgotPassword";
+import OrgResetPassword from "./pages/org/OrgResetPassword";
 import OrgDashboard from "./pages/org/OrgDashboard";
 import OrgDonationDetail from "./pages/org/OrgDonationDetail";
 import OrgProfile from "./pages/org/OrgProfile";
+import VerifyEmail from "./pages/org/VerifyEmail";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +55,8 @@ const AppRoutes = () => {
       <Route path="/" element={<Index />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       
       {/* User Protected Routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -61,6 +68,9 @@ const AppRoutes = () => {
       {/* Organization Routes */}
       <Route path="/org/login" element={<OrgLogin />} />
       <Route path="/org/signup" element={<OrgSignup />} />
+      <Route path="/org/verify-email" element={<VerifyEmail />} />
+      <Route path="/org/forgot-password" element={<OrgForgotPassword />} />
+      <Route path="/org/reset-password" element={<OrgResetPassword />} />
       <Route path="/org/dashboard" element={<OrgProtectedRoute><OrgDashboard /></OrgProtectedRoute>} />
       <Route path="/org/donations/:donationId" element={<OrgProtectedRoute><OrgDonationDetail /></OrgProtectedRoute>} />
       <Route path="/org/profile" element={<OrgProtectedRoute><OrgProfile /></OrgProtectedRoute>} />

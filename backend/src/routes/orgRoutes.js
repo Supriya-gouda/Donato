@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, isOrganization } = require('../middlewares/auth');
-const supabase = require('../config/supabase');
+const { supabase } = require('../config/supabase');
 
 // Organization Signup
 router.post('/signup', async (req, res, next) => {
@@ -21,6 +21,7 @@ router.post('/signup', async (req, res, next) => {
       email,
       password,
       options: {
+        emailRedirectTo: 'http://localhost:5173/org/login',
         data: {
           user_type: 'organization',
           name,
@@ -66,6 +67,7 @@ router.post('/signup', async (req, res, next) => {
 
     res.status(201).json({ 
       success: true, 
+      message: 'Organization registered successfully! Please check your email to verify your account before logging in.',
       data: {
         organization: profile || { 
           id: authData.user.id, 
@@ -76,7 +78,8 @@ router.post('/signup', async (req, res, next) => {
           location,
           verification_status: 'pending'
         },
-        token: authData.session?.access_token
+        token: authData.session?.access_token,
+        emailConfirmationRequired: !authData.user.email_confirmed_at
       }
     });
   } catch (error) {
@@ -110,6 +113,14 @@ router.post('/login', async (req, res, next) => {
       });
     }
 
+    // Check if email is verified
+    if (!authData.user.email_confirmed_at) {
+      return res.status(403).json({ 
+        success: false, 
+        error: 'Please verify your email before logging in. Check your inbox for the verification link.' 
+      });
+    }
+
     // Get organization profile
     const { data: profile, error: profileError } = await supabase
       .from('organization_profiles')
@@ -133,6 +144,88 @@ router.post('/login', async (req, res, next) => {
         },
         token: authData.session.access_token
       }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Request Password Reset for Organization
+router.post('/forgot-password', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email is required' 
+      });
+    }
+
+    // Send password reset email via Supabase
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'http://localhost:5173/org/reset-password',
+    });
+
+    if (error) {
+      return res.status(400).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Password reset email sent. Please check your inbox.' 
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Reset Password for Organization
+router.post('/reset-password', async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'New password is required' 
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Password must be at least 6 characters' 
+      });
+    }
+
+    if (!token) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'No authorization token provided' 
+      });
+    }
+
+    // Update password in Supabase
+    const { error } = await supabase.auth.updateUser(
+      { password },
+      { accessToken: token }
+    );
+
+    if (error) {
+      return res.status(400).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Password updated successfully' 
     });
   } catch (error) {
     next(error);

@@ -43,7 +43,7 @@ export const userService = {
     email: string;
     phone: string;
     password: string;
-  }): Promise<{ user: User; token: string }> {
+  }): Promise<{ user: User; token: string; emailConfirmationRequired?: boolean }> {
     try {
       const response = await fetch(`${API_URL}/users/signup`, {
         method: 'POST',
@@ -56,15 +56,69 @@ export const userService = {
       if (!response.ok) throw new Error('Signup failed');
       const result = await response.json();
       
-      // Store token
-      localStorage.setItem('token', result.data.token);
+      // Only store token if email confirmation is not required
+      if (!result.data.emailConfirmationRequired && result.data.token) {
+        localStorage.setItem('token', result.data.token);
+      }
       
       return {
         user: result.data.user,
-        token: result.data.token
+        token: result.data.token,
+        emailConfirmationRequired: result.data.emailConfirmationRequired
       };
     } catch (error) {
       console.error('Signup error:', error);
+      throw error;
+    }
+  },
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    try {
+      const response = await fetch(`${API_URL}/users/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
+      
+      if (!response.ok) throw new Error('Failed to send reset email');
+      const result = await response.json();
+      
+      return { message: result.message };
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      throw error;
+    }
+  },
+
+  async resetPassword(password: string, token: string): Promise<{ message: string }> {
+    try {
+      // Import supabase dynamically to avoid circular dependencies
+      const { supabase } = await import('@/lib/supabase');
+      
+      // Set the session with the recovery token
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: token,
+        refresh_token: token,
+      });
+
+      if (sessionError) {
+        throw new Error(sessionError.message);
+      }
+
+      // Update the password
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      return { message: 'Password updated successfully' };
+    } catch (error) {
+      console.error('Reset password error:', error);
       throw error;
     }
   },

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Trophy, MapPin, Medal } from "lucide-react";
+import { Trophy, MapPin, Medal, User } from "lucide-react";
 import { Navbar } from "@/components/shared/Navbar";
 import { PageLayout } from "@/components/shared/PageLayout";
 import { PointsBadge } from "@/components/shared/PointsBadge";
@@ -14,6 +14,7 @@ const locations = [
   { value: "Pune", label: "Pune, India" },
   { value: "Mumbai", label: "Mumbai, India" },
   { value: "Bangalore", label: "Bangalore, India" },
+  { value: "Bengaluru", label: "Bengaluru, India" },
   { value: "Delhi", label: "Delhi, India" },
 ];
 
@@ -22,6 +23,18 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState("all");
+
+  // Helper function to format location display
+  const formatLocation = (location: string | undefined): string => {
+    if (!location) return 'N/A';
+    
+    // If already has ", India", return as is
+    if (location.includes(', India')) return location;
+    
+    // Capitalize first letter and add ", India"
+    const capitalized = location.charAt(0).toUpperCase() + location.slice(1).toLowerCase();
+    return `${capitalized}, India`;
+  };
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -39,17 +52,17 @@ const Leaderboard = () => {
   }, [selectedLocation]);
 
   const getRankStyle = (rank: number) => {
-    if (rank === 1) return "bg-yellow-500/10 border-yellow-500/30";
-    if (rank === 2) return "bg-slate-400/10 border-slate-400/30";
-    if (rank === 3) return "bg-amber-700/10 border-amber-700/30";
-    return "";
+    if (rank === 1) return "bg-yellow-500/10 border-yellow-500/30 border-2";
+    if (rank === 2) return "bg-slate-400/10 border-slate-400/30 border-2";
+    if (rank === 3) return "bg-amber-700/10 border-amber-700/30 border-2";
+    return "bg-muted/50 border border-border";
   };
 
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="w-5 h-5 text-yellow-500" />;
-    if (rank === 2) return <Medal className="w-5 h-5 text-slate-400" />;
-    if (rank === 3) return <Medal className="w-5 h-5 text-amber-700" />;
-    return <span className="text-muted-foreground font-medium">{rank}</span>;
+    if (rank === 1) return <Trophy className="w-6 h-6 text-yellow-500" />;
+    if (rank === 2) return <Medal className="w-6 h-6 text-slate-400" />;
+    if (rank === 3) return <Medal className="w-6 h-6 text-amber-700" />;
+    return <span className="text-foreground font-semibold text-sm">{rank}</span>;
   };
 
   return (
@@ -99,15 +112,29 @@ const Leaderboard = () => {
                   )}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div
-                    className={cn(
-                      "w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4",
-                      index === 0 && "bg-yellow-500/20",
-                      index === 1 && "bg-slate-400/20",
-                      index === 2 && "bg-amber-700/20"
-                    )}
-                  >
-                    {getRankIcon(entry.rank)}
+                  <div className="relative mx-auto mb-4 w-20 h-20">
+                    <div
+                      className={cn(
+                        "w-20 h-20 rounded-full flex items-center justify-center",
+                        index === 0 && "bg-yellow-500/20",
+                        index === 1 && "bg-slate-400/20",
+                        index === 2 && "bg-amber-700/20"
+                      )}
+                    >
+                      <User className="w-10 h-10 text-muted-foreground" />
+                    </div>
+                    <div
+                      className={cn(
+                        "absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-lg",
+                        index === 0 && "bg-yellow-500",
+                        index === 1 && "bg-slate-400",
+                        index === 2 && "bg-amber-700"
+                      )}
+                    >
+                      {index === 0 && <Trophy className="w-4 h-4 text-white" />}
+                      {index === 1 && <Medal className="w-4 h-4 text-white" />}
+                      {index === 2 && <Medal className="w-4 h-4 text-white" />}
+                    </div>
                   </div>
                   <h3 className="font-semibold text-foreground mb-1">
                     {entry.name}
@@ -115,7 +142,7 @@ const Leaderboard = () => {
                       <span className="ml-2 text-xs text-primary">(You)</span>
                     )}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-3">{entry.location}</p>
+                  <p className="text-sm text-muted-foreground mb-3">{formatLocation(entry.location)}</p>
                   <div className="flex items-center justify-center gap-3">
                     <span className="text-2xl font-bold text-primary">
                       {entry.points.toLocaleString()}
@@ -143,7 +170,7 @@ const Leaderboard = () => {
                   <th className="px-4 py-4 text-left text-sm font-semibold text-foreground">
                     Donor
                   </th>
-                  <th className="px-4 py-4 text-left text-sm font-semibold text-foreground hidden sm:table-cell">
+                  <th className="px-4 py-4 text-left text-sm font-semibold text-foreground">
                     Location
                   </th>
                   <th className="px-4 py-4 text-right text-sm font-semibold text-foreground">
@@ -169,13 +196,21 @@ const Leaderboard = () => {
                         )}
                       >
                         <td className="px-4 py-4">
-                          <div
-                            className={cn(
-                              "w-8 h-8 rounded-full flex items-center justify-center",
-                              getRankStyle(entry.rank)
-                            )}
-                          >
-                            {getRankIcon(entry.rank)}
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={cn(
+                                "w-10 h-10 rounded-full flex items-center justify-center font-bold text-base",
+                                entry.rank === 1 && "bg-yellow-500/20 border-2 border-yellow-500/50",
+                                entry.rank === 2 && "bg-slate-400/20 border-2 border-slate-400/50",
+                                entry.rank === 3 && "bg-amber-700/20 border-2 border-amber-700/50",
+                                entry.rank > 3 && "bg-muted/50 border border-border"
+                              )}
+                            >
+                              {entry.rank === 1 ? <Trophy className="w-6 h-6 text-yellow-500" /> :
+                               entry.rank === 2 ? <Medal className="w-6 h-6 text-slate-400" /> :
+                               entry.rank === 3 ? <Medal className="w-6 h-6 text-amber-700" /> :
+                               <span className="text-foreground font-bold">{entry.rank}</span>}
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 py-4">
@@ -188,8 +223,8 @@ const Leaderboard = () => {
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-4 text-muted-foreground hidden sm:table-cell">
-                          {entry.location}
+                        <td className="px-4 py-4 text-muted-foreground">
+                          {formatLocation(entry.location)}
                         </td>
                         <td className="px-4 py-4 text-right font-semibold text-foreground">
                           {entry.points.toLocaleString()}
