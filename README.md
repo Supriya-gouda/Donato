@@ -229,5 +229,5 @@ Licensed under the ISC License.
 
 ## Contact
 
-- Name: `Harshal Sirampura Lokesh`
-- Email: `harshalsl2005@gmail.com`
+- Name: `Harshal Sriampura Lokesh , Supriya Gouda`
+
