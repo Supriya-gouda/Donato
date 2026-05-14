@@ -3,30 +3,30 @@ pipeline {
     agent any
 
     environment {
+
         FRONTEND_IMAGE = "harshalsl0209/donato-frontend"
-        BACKEND_IMAGE = "harshalsl0209/donato-backend"
+        BACKEND_IMAGE  = "harshalsl0209/donato-backend"
     }
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-            git branch: 'main',
-            url: 'https://github.com/Supriya-gouda/Donato.git'
-    }
-        }
-
         stage('Build Frontend Image') {
+
             steps {
+
                 dir('frontend') {
+
                     bat 'docker build -t %FRONTEND_IMAGE% .'
                 }
             }
         }
 
         stage('Build Backend Image') {
+
             steps {
+
                 dir('backend') {
+
                     bat 'docker build -t %BACKEND_IMAGE% .'
                 }
             }
@@ -50,13 +50,55 @@ pipeline {
             }
         }
 
+        stage('Create Environment Files') {
+
+            steps {
+
+                withCredentials([
+
+                    string(credentialsId: 'SUPABASE_URL', variable: 'SUPABASE_URL'),
+
+                    string(credentialsId: 'SUPABASE_ANON_KEY', variable: 'SUPABASE_ANON_KEY'),
+
+                    string(credentialsId: 'SUPABASE_SERVICE_ROLE_KEY', variable: 'SUPABASE_SERVICE_ROLE_KEY')
+
+                ]) {
+
+                    writeFile file: 'frontend/.env', text: """
+VITE_SUPABASE_URL=${SUPABASE_URL}
+VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+"""
+
+                    writeFile file: 'backend/.env', text: """
+SUPABASE_URL=${SUPABASE_URL}
+SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+PORT=8080
+"""
+                }
+            }
+        }
+
         stage('Deploy Containers') {
 
             steps {
 
                 bat 'docker compose down'
+
                 bat 'docker compose up -d --build'
             }
+        }
+    }
+
+    post {
+
+        success {
+
+            echo 'Pipeline executed successfully!'
+        }
+
+        failure {
+
+            echo 'Pipeline failed!'
         }
     }
 }
