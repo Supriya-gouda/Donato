@@ -11,8 +11,9 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Supriya-gouda/Donato.git'
-            }
+            git branch: 'main',
+            url: 'https://github.com/Supriya-gouda/Donato.git'
+    }
         }
 
         stage('Build Frontend Image') {
