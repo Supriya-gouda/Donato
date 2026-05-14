@@ -58,9 +58,7 @@ pipeline {
 
                     string(credentialsId: 'SUPABASE_URL', variable: 'SUPABASE_URL'),
 
-                    string(credentialsId: 'SUPABASE_ANON_KEY', variable: 'SUPABASE_ANON_KEY'),
-
-                    string(credentialsId: 'SUPABASE_SERVICE_ROLE_KEY', variable: 'SUPABASE_SERVICE_ROLE_KEY')
+                    string(credentialsId: 'SUPABASE_ANON_KEY', variable: 'SUPABASE_ANON_KEY')
 
                 ]) {
 
@@ -70,8 +68,6 @@ VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
 """
 
                     writeFile file: 'backend/.env', text: """
-SUPABASE_URL=${SUPABASE_URL}
-SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
 PORT=8080
 """
                 }
