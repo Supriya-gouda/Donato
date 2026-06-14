@@ -147,7 +147,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <Logo />
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Donatio. All rights reserved.
+              © {new Date().getFullYear()} Donatio. All rights reserved students of BMSITM.
             </p>
           </div>
         </div>
